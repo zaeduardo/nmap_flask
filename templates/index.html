@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executar Nmap</title>
+    <style>
+        /* Estilo para o formulário e área de resultado */
+        textarea, pre {
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            white-space: pre-wrap; /* Mantém a formatação de espaços e quebras de linha */
+            overflow: auto;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Executar Nmap</h1>
+<form id="nmap-form">
+    <label for="site">Site:</label>
+    <input type="text" id="site" name="site" required>
+    
+    <label for="parametros">Parâmetros Nmap:</label>
+    <input type="text" id="parametros" name="parametros" placeholder="Ex: -sV -T4" required>
+
+    <button type="button" onclick="executarNmap()">Executar Nmap</button>
+</form>
+
+<h2>Resultado do Nmap</h2>
+<pre id="resultado-nmap">
+    <!-- Resultados serão preenchidos aqui -->
+</pre>
+
+<script>
+    function executarNmap() {
+        var site = document.getElementById('site').value;
+        var parametros = document.getElementById('parametros').value;
+
+        fetch('/obter_ip?site=' + site)
+            .then(response => response.json())
+            .then(data => {
+                if (data.erro) {
+                    alert(data.erro);
+                } else {
+                    var ip = data.ip;
+                    return fetch('/executar_nmap', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            'ip': ip,
+                            'parametros': parametros
+                        })
+                    });
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                var resultado = data.resultado;
+                var resultadoNmap = document.getElementById('resultado-nmap');
+                resultadoNmap.textContent = resultado; // Preenche a área de resultado com a saída do Nmap
+            })
+            .catch(error => {
+                alert('Erro ao executar o Nmap: ' + error);
+            });
+    }
+</script>
+
+</body>
+</html>
