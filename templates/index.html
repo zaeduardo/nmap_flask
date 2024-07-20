@@ -41,7 +41,10 @@
         var site = document.getElementById('site').value;
         var parametros = document.getElementById('parametros').value;
 
-        fetch('/obter_ip?site=' + site)
+        console.log('Site:', site);
+        console.log('Parâmetros:', parametros);
+
+        fetch('/obter_ip?site=' + encodeURIComponent(site))
             .then(response => response.json())
             .then(data => {
                 if (data.erro) {
@@ -63,6 +66,7 @@
             .then(response => response.json())
             .then(data => {
                 var resultado = data.resultado;
+                console.log('Resultado:', resultado);
                 var resultadoNmap = document.getElementById('resultado-nmap');
                 resultadoNmap.textContent = resultado; // Preenche a área de resultado com a saída do Nmap
             })
